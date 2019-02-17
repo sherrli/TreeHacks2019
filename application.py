@@ -15,11 +15,19 @@ import requests
 import shutil
 from word2number import w2n
 import time, threading
+import csv
 
 
 app = Flask(__name__)
 
 simple_geoip = SimpleGeoIP(app)
+
+with open('droogs.csv', 'r') as f:
+    reader = csv.reader(f)
+    drug_list_list = list(reader)
+    
+drug_list = [item for sublist in drug_list_list for item in sublist]
+
 
 @app.route("/")
 def index():
@@ -94,15 +102,21 @@ def twilio():
     print(text_list)
     
     temp = listparser(text_list)
-    temp2 = checkpoint(text_list)
-
-    seconds = 5
+    seconds = checkpoint(text_list)
+    # refillnum = refill_check(text_list)
+    
+    # print(refillnum)
+    # if refillnum == "unknown":
+    #     refillnum = 1
     pills = 5
-    
+    drug = drugmatcher(text_list)
+    print(f"drug is: {drug}")
+    # for i in range(refillnum):
     for i in range(pills):
-        sender("Take your meds!")
+        sender(f"Take your {drug}!")
         time.sleep(seconds)
-    
+        # sender("Refill your presciption")
+        
     
    
 
@@ -302,15 +316,45 @@ def listparser(textlist):
     
     return(1)
     
+# def checkpoint(label):
+#   for i in range(len(label)-1):
+#   #for i in (label):
+#       #if next is days get the w-number conver it to real number
+#       if label[i+1] == 'days':
+#           w_number = w2n.word_to_num(label[i])
+#           print(w_number)
+#           return w_number
+#       #return False
+       
 def checkpoint(label):
    for i in range(len(label)-1):
-   #for i in (label):
+
        #if next is days get the w-number conver it to real number
-       if label[i+1] == 'days':
-           w_number = w2n.word_to_num(label[i])
-           print(w_number)
-           return w_number
-       #return False
+       if label[i+1].lower() == 'days':
+           i_days = w2n.word_to_num(label[i])
+           return i_days
+       if label[i+1].lower() == 'hours':
+           i_hours = w2n.word_to_num(label[i])
+           return i_hours
+       if label[i].lower() == 'day':
+           day = 1;
+           return day;
+       if label[i+1].lower() == 'day' and label[i].lower() == 'other':
+           skip_day = 9999999999999999; ############# !!!!!!!!!!!!!!!!
+           return skip_day;
+           
+def refill_check(label):
+   for i in range(len(label)-1):
+       #refills
+       if label[i].lower() == 'no refill' or label[i].lower() == 'no refills' or label[i].lower() == 'no ref':
+           refill = 0;
+           return refill;
+       if label[i].lower() == 'refill' or label[i].lower() == 'refills' or label[i].lower() == 'ref' or label[i].lower() == 'refil' :
+           try:
+               refill = w2n.word_to_num(label[i+1])
+           except:
+               refill = "unknown";
+           return refill;
        
        
 def sender(message):
@@ -349,3 +393,13 @@ def sender(message):
 #     sender("take your meds")   
 #     threading.Timer(5, pillspam).start()
     
+    
+    
+def drugmatcher(label):
+    drugmatch = "meds"
+    for word in label:
+        if word.upper() in drug_list:
+            drugmatch = word.title()
+            break
+    return(drugmatch)
+            
