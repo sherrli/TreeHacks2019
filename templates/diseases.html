@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ArcGIS DevLabs: Create a JavaScript starter app</title>
+    <style>
+      html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.10/"></script>
+
+    <script>
+      require([
+        
+        
+        
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/layers/FeatureLayer",
+          "dojo/domReady!",
+
+        ], function(Map, MapView, FeatureLayer) {
+
+        var map = new Map({
+          basemap: "satellite"
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-100.71511,39.09042],
+          zoom: 5
+        });
+          // Trailheads point feature layer
+       var featureLayer = new FeatureLayer({
+         url: "https://services9.arcgis.com/zXmuxbLaZGBdDFRA/arcgis/rest/services/citiessubset/FeatureServer/0?token=zF_Uaedea9xhoPJxjwWrtstlN15Bmh1GPhZPDDuEH0TDaEdzrVi54up5nTSu88Bpdl4lgXNtOSAcrdqq5uLoeEPfTcP1MFhxMaEwn_ywoex0u_6A5pY3TIBdLIiPYGHjtvWUJiod0IDP-nGmkbb4hdLZgWCbGtuReHR4imY1fGJ36001i0-xL9mnHDY3ITXFces6itYNYGhUA_3kDHZn2w69R7R88Y7pqJ7W0uZT0eY."
+     });
+
+  map.add(featureLayer);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
